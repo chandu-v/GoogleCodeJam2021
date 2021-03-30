@@ -1,8 +1,13 @@
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 class Solution {
     static Scanner in = new Scanner(System.in);
+    static int X,Y;
+    static int [][] dp;
+    static String str;
+    static int SENT = -2_000_000_000;
     
     public static void main(String[] args) {
         int T = in.nextInt();
@@ -11,30 +16,32 @@ class Solution {
         }
     }
 
-    public static void solve(int i){
-        int X = in.nextInt();
-        int Y = in.nextInt();
-        String str = in.next();
-        System.out.println(String.format("Case #%S: %S", i+1,solveForMin2(str, X, Y)));
+    public static void solve(int tt){
+        X = in.nextInt();
+        Y = in.nextInt();
+        str = in.next();
+        dp = new int[2][str.length()+1];
+        for ( int i = 0 ; i <dp.length; i++ ) Arrays.fill(dp[i], SENT);
+        // System.out.println(String.format("Case #%S: %S", i+1,solveForMin(str, X, Y)));
+        System.out.println(String.format("Case #%S: %S", tt+1,Math.min(go(0,0),go(1,0))));
     }
 
-    public static int solveForMin2(String str, int X , int Y) {
-        int last_c = 0;
-        int last_j = 0;
-        final int INF = Integer.MAX_VALUE;
-        for(int i = 0 ; i < str.length() ; i++) {
-            int new_last_c = INF-X;
-            int new_last_j = INF-Y;
-            if(str.charAt(i) == '?' || str.charAt(i) == 'C') {
-                new_last_c = Math.min(last_c, last_j+Y);
-            }
-            if(str.charAt(i) == '?' || str.charAt(i) == 'J') {
-                new_last_j = Math.min(last_j, last_c+X);
-            }
-            last_c = new_last_c;
-            last_j = new_last_j;
+    public static int go(int placed, int index) {
+        if (dp[placed][index]!= SENT ) return dp[placed][index];
+        if((str.charAt(index) == 'C' && placed ==1) ||
+        (str.charAt(index) == 'J' && placed == 0)) {
+            return dp[placed][index] = (int)1e9;
         }
-        return Math.min(last_c, last_j);
+        if(index == str.length()-1) return 0;
+
+        int best = (int)1e9;
+
+        best = Math.min(best,(placed!=0?Y:0)+go(0,index+1));
+
+        best = Math.min(best, (placed!=1?X:0)+go(1,index+1));
+
+        return dp[placed][index]= best;
+
     }
     public static int solveForMin(String str,int X, int Y) {
         if(!str.contains("?")) {
